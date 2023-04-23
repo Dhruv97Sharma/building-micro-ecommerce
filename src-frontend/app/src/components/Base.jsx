@@ -8,7 +8,7 @@ const Base = () => {
     return (
         <>
         <Navbar />
-        <div class="container mx-auto mt-4 min-h-screen">
+        <div className="container mx-auto mt-4 min-h-screen">
             <Router/>
         </div>
         <Footer />

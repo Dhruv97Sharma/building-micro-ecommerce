@@ -1,11 +1,15 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.core.files.storage import FileSystemStorage
 
 # Create your models here.
+protected_storage = FileSystemStorage(location=str(settings.PROTECTED_MEDIA_ROOT))
+
 class Product(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
     name = models.CharField(max_length=120)
+    image = models.ImageField(upload_to="products/", blank=True, null=True)
     handle = models.SlugField(unique=True) # slug
     price = models.DecimalField(max_digits=10, decimal_places=2, default=9.99)
     original_price = models.DecimalField(max_digits=10, decimal_places=2, default=9.99)
@@ -21,3 +25,17 @@ class Product(models.Model):
             # trigger an API request for the price
             self.stripe_price = int(self.price * 100)
         super().save(*args, **kwargs)
+
+def handle_product_attachment_upload(instance, filename):
+    return f"products/{instance.product.handle}/attachments/{filename}"
+
+class ProductAttachment(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    file = models.FileField(
+        upload_to=handle_product_attachment_upload, 
+        storage=protected_storage,
+    )
+    is_free = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
