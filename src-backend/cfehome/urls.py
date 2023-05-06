@@ -20,14 +20,16 @@ from django.conf.urls.static import static
 
 from . import views
 from products.views import ProductViewSet, ProductAttachmentViewSet
+from purchases.views import PurchaseViewSet
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'products', ProductViewSet)
 router.register(r'product-attachments', ProductAttachmentViewSet)
+router.register(r'purchases', PurchaseViewSet)
 
 urlpatterns = [
-    path('products/', views.home_view),
+    # path('products/', views.home_view),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/', include(router.urls))
